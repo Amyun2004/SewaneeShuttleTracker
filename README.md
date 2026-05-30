@@ -160,6 +160,8 @@ Real-time
 ---
 
 ## Project layout
+
+```
 .
 ├── app/
 │   ├── config.py         # pydantic-settings, reads .env
@@ -186,7 +188,7 @@ Real-time
 ├── pyproject.toml
 ├── alembic.ini
 └── .env.example
-
+```
 ---
 
 ## What changed from the original
