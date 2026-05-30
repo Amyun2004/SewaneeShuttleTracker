@@ -32,3 +32,6 @@ node_modules/
 
 # OS / logs
 *.log
+
+# Alembic — keep migrations/ tracked but ignore the local cache
+migrations/__pycache__/
