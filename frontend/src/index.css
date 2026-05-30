@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+/* =============================================================
+   Sewanee Transit — design tokens
+
+   Tailwind v4 reads `@theme` and exposes each token as a utility
+   class (e.g. `bg-sewanee-purple`) and as a CSS variable
+   (`var(--color-sewanee-purple)`). Same palette as the original
+   Flask templates so the visual language is preserved.
+   ============================================================= */
+@theme {
+  --color-sewanee-purple: #582C83;
+  --color-sewanee-purple-light: #6d35a0;
+  --color-sewanee-gold: #C8A051;
+  --color-sewanee-gold-light: #d4ad5b;
+  --color-sewanee-navy: #1C1C1E;
+  --color-sewanee-lavender: #F4F1F8;
+
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, "SFMono-Regular", monospace;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-sewanee-lavender);
+  color: #111827;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
