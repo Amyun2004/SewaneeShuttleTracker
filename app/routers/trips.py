@@ -80,9 +80,18 @@ async def ping(trip_id: int, payload: PingIn, user: DriverDep, db: DBDep):
             INSERT INTO locations
                 (trip_id, latitude, longitude, accuracy_meters, speed_mph,
                  recorded_at, geom)
-            VALUES
-                (:tid, :lat, :lng, :acc, :spd, now(),
-                 ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography)
+            VALUES (
+                :tid,
+                CAST(:lat AS numeric),
+                CAST(:lng AS numeric),
+                :acc,
+                :spd,
+                now(),
+                ST_SetSRID(
+                    ST_MakePoint(CAST(:lng AS float8), CAST(:lat AS float8)),
+                    4326
+                )::geography
+            )
         """),
         {
             "tid": trip_id,
