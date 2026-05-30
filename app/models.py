@@ -116,7 +116,7 @@ class Stop(Base):
     longitude:   Mapped[Decimal]    = mapped_column(Numeric(9, 6))
     description: Mapped[str | None] = mapped_column(String(255))
     geom:        Mapped[str]        = mapped_column(
-        Geography(geometry_type="POINT", srid=4326)
+        Geography(geometry_type="POINT", srid=4326, spatial_index=False)
     )
 
 
@@ -172,7 +172,7 @@ class Location(Base):
         DateTime(timezone=True), server_default=func.now()
     )
     geom: Mapped[str] = mapped_column(
-        Geography(geometry_type="POINT", srid=4326)
+        Geography(geometry_type="POINT", srid=4326, spatial_index=False)
     )
 
 
