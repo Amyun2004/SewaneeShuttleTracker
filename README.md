@@ -8,9 +8,9 @@ PostGIS + React stack.
 
 🚧 Modernization in progress. See branches for active work.
 
-- `main` — stable
-- `phase-1-backend` — FastAPI + PostgreSQL/PostGIS rewrite
-- `phase-2-frontend` — Vite + React + TypeScript frontend (later)
+- `main` : stable
+- `phase-1-backend` : FastAPI + PostgreSQL/PostGIS rewrite
+- `phase-2-frontend` : Vite + React + TypeScript frontend (later)
 
 ## Original stack
 
