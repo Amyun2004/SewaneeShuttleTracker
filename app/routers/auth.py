@@ -197,7 +197,7 @@ async def me(user: CurrentUserDep):
     return UserOut(
         user_id=user.user_id,
         username=user.username,
-        email="",  # not loaded; frontend usually has this cached
+        email=user.email,
         full_name=user.full_name,
         active_role=user.active_role,
         all_roles=sorted(user.all_roles),
@@ -215,7 +215,7 @@ async def switch_mode(
     return UserOut(
         user_id=user.user_id,
         username=user.username,
-        email="",
+        email=user.email,
         full_name=user.full_name,
         active_role=new_role,
         all_roles=sorted(user.all_roles),

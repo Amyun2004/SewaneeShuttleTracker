@@ -26,12 +26,14 @@ class CurrentUser:
         self,
         user_id: int,
         username: str,
+        email: str,
         full_name: str,
         active_role: str,
         all_roles: set[str],
     ):
         self.user_id     = user_id
         self.username    = username
+        self.email       = email
         self.full_name   = full_name
         self.active_role = active_role
         self.all_roles   = all_roles
@@ -73,6 +75,7 @@ async def get_current_user(
     return CurrentUser(
         user_id=user.user_id,
         username=user.username,
+        email=user.email,
         full_name=user.full_name,
         active_role=active_role,
         all_roles=roles,
