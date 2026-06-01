@@ -37,11 +37,14 @@ export interface LiveShuttle {
   latitude: number;
   longitude: number;
   speed_mph: number | null;
-  bearing_deg: number | null;
   seconds_ago: number;
 }
 
 export interface NearestShuttle extends LiveShuttle {
-  distance_meters: number;
-  eta_seconds: number | null;
+  distance_m: number;
+  distance_miles: number;
+  distance_feet: number;
+  bearing: number;
+  walking_minutes: number;
+  shuttle_eta_minutes: number | null;
 }
