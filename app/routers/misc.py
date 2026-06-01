@@ -100,6 +100,20 @@ async def create_alert(payload: AlertIn, user: AdminDep, db: DBDep):
     await db.commit()
     return {"ok": True}
 
+@router.get("/alerts")
+async def list_alerts(db: DBDep):
+    """Public list of active (non-expired) alerts, newest first."""
+    rows = (await db.execute(text("""
+        SELECT a.alert_id, a.title, a.body, a.severity,
+               a.created_at, a.expires_at,
+               u.full_name AS author_name
+        FROM alerts a
+        LEFT JOIN users u ON u.user_id = a.created_by
+        WHERE a.expires_at IS NULL OR a.expires_at > now()
+        ORDER BY a.created_at DESC
+        LIMIT 20
+    """))).mappings().all()
+    return [dict(r) for r in rows]
 
 @router.delete("/alerts/{alert_id}")
 async def delete_alert(alert_id: int, user: AdminDep, db: DBDep):
