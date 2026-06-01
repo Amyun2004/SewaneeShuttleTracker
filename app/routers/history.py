@@ -42,7 +42,7 @@ async def history(
     shuttle_id: int | None = None,
 ):
     trips_rows = (await db.execute(text(TRIPS_SQL), {
-        "days": days, "route_id": route_id, "shuttle_id": shuttle_id,
+        "days": str(days), "route_id": route_id, "shuttle_id": shuttle_id,
     })).mappings().all()
 
     trips = [dict(t) for t in trips_rows]
