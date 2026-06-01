@@ -48,3 +48,25 @@ export interface NearestShuttle extends LiveShuttle {
   walking_minutes: number;
   shuttle_eta_minutes: number | null;
 }
+export interface RouteSummary {
+  route_id: number;
+  route_name: string;
+  description: string | null;
+}
+
+export interface Stop {
+  stop_id: number;
+  stop_name: string;
+  latitude: number;
+  longitude: number;
+  description: string | null;
+  sequence_number: number | null;
+  expected_min_from_start: number | null;
+}
+
+export interface RouteDetail {
+  route_id: number;
+  route_name: string;
+  description: string | null;
+  stops: Stop[];
+}

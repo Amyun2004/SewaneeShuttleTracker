@@ -34,3 +34,25 @@ export const userIcon = L.divIcon({
     "></div>
   `,
 });
+/**
+ * Numbered stop marker. We pass in the stop's sequence number so the
+ * pin shows "1", "2", "3" in order along the route — much easier for
+ * users to follow than identical dots.
+ */
+export function stopIcon(label: string | number): L.DivIcon {
+  return L.divIcon({
+    className: "",
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+    html: `
+      <div style="
+        width: 28px; height: 28px; border-radius: 50%;
+        background: #582C83;
+        border: 2px solid white;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        display: flex; align-items: center; justify-content: center;
+        color: white; font-weight: 700; font-size: 12px; font-family: ui-monospace, monospace;
+      ">${label}</div>
+    `,
+  });
+}

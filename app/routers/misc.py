@@ -3,9 +3,9 @@ from fastapi import APIRouter, HTTPException
 from sqlalchemy import select, text
 
 from app.deps import AdminDep, CurrentUserDep, DBDep
-from app.models import Alert, Incident
+from app.models import Alert, Incident, Route
 from app.schemas import (
-    AlertIn, IncidentIn, IncidentStatusIn, RouteDetail, StopOut,
+    AlertIn, IncidentIn, IncidentStatusIn, RouteDetail, RouteSummary, StopOut,
 )
 
 router = APIRouter()
@@ -22,7 +22,20 @@ async def stops(db: DBDep):
     """))).mappings().all()
     return [dict(r) for r in rows]
 
-
+@router.get("/routes", response_model=list[RouteSummary])
+async def list_routes(db: DBDep):
+    """All routes for the schedule page. Active routes only."""
+    rows = await db.scalars(
+        select(Route).where(Route.is_active.is_(True)).order_by(Route.route_name)
+    )
+    return [
+        RouteSummary(
+            route_id=r.route_id,
+            route_name=r.route_name,
+            description=r.description,
+        )
+        for r in rows
+    ]
 @router.get("/routes/{route_id}", response_model=RouteDetail)
 async def route_detail(route_id: int, db: DBDep):
     route = (await db.execute(text("""

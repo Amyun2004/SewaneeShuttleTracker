@@ -146,6 +146,13 @@ class StopOut(BaseModel):
     expected_min_from_start: int | None = None
 
 
+class RouteSummary(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    route_id:    int
+    route_name:  str
+    description: str | None
+    
 class RouteDetail(BaseModel):
     route_id:    int
     route_name:  str
