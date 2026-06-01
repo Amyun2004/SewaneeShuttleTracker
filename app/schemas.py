@@ -152,7 +152,11 @@ class RouteSummary(BaseModel):
     route_id:    int
     route_name:  str
     description: str | None
-    
+class ShuttleSummary(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    shuttle_id:   int
+    shuttle_name: str
 class RouteDetail(BaseModel):
     route_id:    int
     route_name:  str

@@ -8,7 +8,7 @@ from fastapi import APIRouter, Query
 from sqlalchemy import text
 
 from app.deps import DBDep
-from app.schemas import LiveShuttle, NearestShuttle
+from app.schemas import LiveShuttle, NearestShuttle, ShuttleSummary
 
 router = APIRouter()
 
@@ -104,3 +104,16 @@ async def nearest(
         walking_minutes=max(1, round(miles / 3 * 60)),
         shuttle_eta_minutes=eta,
     )
+
+LIST_SQL = """
+SELECT shuttle_id, shuttle_name
+FROM shuttles
+ORDER BY shuttle_name
+"""
+
+
+@router.get("", response_model=list[ShuttleSummary])
+async def list_shuttles(db: DBDep):
+    """All shuttles for filter dropdowns and the driver Start Trip picker."""
+    rows = (await db.execute(text(LIST_SQL))).mappings().all()
+    return [dict(r) for r in rows]
