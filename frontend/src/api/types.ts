@@ -70,3 +70,26 @@ export interface RouteDetail {
   description: string | null;
   stops: Stop[];
 }
+
+export interface HistoryTrip {
+  trip_id: number;
+  route_id: number;
+  route_name: string;
+  shuttle_id: number;
+  shuttle_name: string;
+  driver_name: string;
+  start_time: string;
+  end_time: string | null;
+  /** Backend returns `duration_min`, not `duration_minutes`. */
+  duration_min: number | null;
+  /** Ordered [lat, lng] pairs forming the trip's path. May be empty. */
+  path: [number, number][];
+}
+
+/** The full response from /api/history — includes filter options inline. */
+export interface HistoryResponse {
+  trips: HistoryTrip[];
+  routes: { route_id: number; route_name: string }[];
+  shuttles: { shuttle_id: number; shuttle_name: string }[];
+  days: number;
+}
