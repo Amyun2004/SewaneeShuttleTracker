@@ -93,3 +93,105 @@ export interface HistoryResponse {
   shuttles: { shuttle_id: number; shuttle_name: string }[];
   days: number;
 }
+
+// ---------- Admin dashboard ----------
+
+export type Severity = "info" | "warning" | "critical";
+export type IncidentStatus = "open" | "reviewing" | "resolved";
+export type IncidentCategory =
+  | "shuttle"
+  | "stop"
+  | "driver"
+  | "safety"
+  | "other";
+
+export interface DashStats {
+  total_trips: number;
+  active_drivers: number;
+  registered_drivers: number;
+  open_incidents: number;
+}
+
+export interface DriverRow {
+  driver: string;
+  total_hours: number;
+  trip_count?: number;
+}
+
+export interface StopVisit {
+  stop_name: string;
+  visits: number;
+}
+
+export interface RouteEfficiency {
+  route_name: string;
+  avg_actual_minutes: number;
+  scheduled_minutes: number;
+  minutes_over_schedule: number;
+}
+
+export interface NewDriver {
+  username: string;
+  full_name: string;
+  email: string;
+  created_at: string;
+  trip_count: number;
+}
+
+export interface AdminIncident {
+  incident_id: number;
+  category: IncidentCategory;
+  location: string | null;
+  description: string;
+  status: IncidentStatus;
+  created_at: string;
+  reporter_username: string;
+  reporter_name: string;
+}
+
+export interface AdminAlert {
+  alert_id: number;
+  title: string;
+  body: string;
+  severity: Severity;
+  created_at: string;
+  expires_at: string | null;
+  author_name: string;
+  is_active: boolean;
+}
+
+/** Public alert shape from GET /api/alerts. Same as AdminAlert minus is_active. */
+export interface PublicAlert {
+  alert_id: number;
+  title: string;
+  body: string;
+  severity: Severity;
+  created_at: string;
+  expires_at: string | null;
+  author_name: string;
+}
+
+export interface AdminRecentTrip {
+  trip_id: number;
+  start_time: string;
+  end_time: string | null;
+  route_name: string;
+  shuttle_name: string;
+  driver_name: string;
+  duration_min: number | null;
+  scheduled_minutes: number | null;
+  punctuality: "on_time" | "delayed" | "early" | null;
+}
+
+export interface AdminDashboard {
+  stats: DashStats;
+  ontime_rate: number;
+  top_driver: { driver: string; total_hours: number; trip_count: number } | null;
+  all_drivers_ranked: DriverRow[];
+  weekend_stops: StopVisit[];
+  route_efficiency: RouteEfficiency[];
+  new_drivers: NewDriver[];
+  incidents: AdminIncident[];
+  alerts: AdminAlert[];
+  recent_trips: AdminRecentTrip[];
+}

@@ -195,7 +195,7 @@ export function MapView() {
       </aside>
 
       {/* MAP */}
-      <div className="flex-grow h-[60vh] lg:h-auto">
+      <div className="flex-grow h-[60vh] lg:h-auto overflow-hidden relative">
         <MapContainer
           center={initialCenter}
           zoom={DEFAULT_ZOOM}

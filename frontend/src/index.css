@@ -20,6 +20,29 @@
   --font-mono: "DM Mono", ui-monospace, "SFMono-Regular", monospace;
 }
 
+/* =============================================================
+   Leaflet z-index containment
+
+   Leaflet's default z-indexes for its layer panes (200-700) are
+   higher than our app shell's sticky header (z-50). Without this,
+   the map overlays the header's dropdown menu and any popups
+   anchored to the top bar — clicking the avatar tile silently
+   does nothing because the click hits the map first.
+
+   We pin the map's z-index ceiling below 50, then bump the
+   header above any conceivable Leaflet element.
+   ============================================================= */
+.leaflet-pane,
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 10 !important;
+}
+
+/* Keep popups above their pane but still below the app header. */
+.leaflet-popup {
+  z-index: 30 !important;
+}
+
 html, body, #root {
   height: 100%;
 }

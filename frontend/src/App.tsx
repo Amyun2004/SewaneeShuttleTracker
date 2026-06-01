@@ -13,6 +13,7 @@ import { Schedule } from "@/pages/Schedule";
 import { History } from "@/pages/History";
 import { Track } from "@/pages/Track";
 import { NotFound } from "@/pages/NotFound";
+import { Admin } from "@/pages/Admin";
 
 export default function App() {
   return (
@@ -29,6 +30,13 @@ export default function App() {
           element={
             <RequireAuth roles={["driver"]}>
               <Track />
+            </RequireAuth>
+          }
+        /><Route
+          path="admin"
+          element={
+            <RequireAuth roles={["admin"]}>
+              <Admin />
             </RequireAuth>
           }
         />
