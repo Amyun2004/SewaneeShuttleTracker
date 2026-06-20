@@ -10,7 +10,6 @@ import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { api, ApiError } from "@/api/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { NearestShuttle, PublicAlert, Severity } from "@/api/types";
 import { useAuth } from "@/auth/AuthContext";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { cn } from "@/lib/cn";
