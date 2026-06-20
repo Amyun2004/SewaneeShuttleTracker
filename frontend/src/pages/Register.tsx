@@ -3,8 +3,15 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ApiError } from "@/api/client";
 import { useAuth } from "@/auth/AuthContext";
+import type { RegisterRole } from "@/api/types";
 import { Input } from "@/components/ui/Input";
 import { cn } from "@/lib/cn";
+
+const ROLE_OPTIONS: { value: RegisterRole; label: string }[] = [
+  { value: "student", label: "Student" },
+  { value: "staff", label: "Staff" },
+  { value: "driver", label: "Driver" },
+];
 
 export function Register() {
   const { register } = useAuth();
@@ -12,10 +19,12 @@ export function Register() {
 
   const [form, setForm] = useState({
     username: "",
-    name: "",
+    first_name: "",
+    last_name: "",
     email: "",
     password: "",
   });
+  const [role, setRole] = useState<RegisterRole>("student");
   const [agreed, setAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +42,7 @@ export function Register() {
     }
     setSubmitting(true);
     try {
-      await register({ ...form, agreed_to_terms: agreed });
+      await register({ ...form, role, terms: agreed });
       nav("/", { replace: true });
     } catch (err) {
       if (err instanceof ApiError) {
@@ -55,17 +64,28 @@ export function Register() {
         </p>
 
         <form onSubmit={onSubmit} className="space-y-4">
-          <Input
-            name="name"
-            label="Full name"
-            required
-            value={form.name}
-            onChange={(e) => set("name", e.target.value)}
-          />
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              name="first_name"
+              label="First name"
+              autoComplete="given-name"
+              required
+              value={form.first_name}
+              onChange={(e) => set("first_name", e.target.value)}
+            />
+            <Input
+              name="last_name"
+              label="Last name"
+              autoComplete="family-name"
+              required
+              value={form.last_name}
+              onChange={(e) => set("last_name", e.target.value)}
+            />
+          </div>
           <Input
             name="username"
             label="Username"
-            hint="Letters, numbers, dot or underscore. 3–20 chars."
+            hint="Start with a letter, end with a number. Letters, numbers, and underscores only (4–32 chars)."
             required
             value={form.username}
             onChange={(e) => set("username", e.target.value)}
@@ -89,6 +109,33 @@ export function Register() {
             value={form.password}
             onChange={(e) => set("password", e.target.value)}
           />
+
+          {/* Role */}
+          <div>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
+              I am a
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {ROLE_OPTIONS.map((opt) => {
+                const active = role === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setRole(opt.value)}
+                    className={cn(
+                      "py-2.5 rounded-xl border text-sm font-bold transition",
+                      active
+                        ? "bg-sewanee-purple text-white border-sewanee-purple shadow-md"
+                        : "bg-white border-gray-200 text-gray-700 hover:border-sewanee-purple/40"
+                    )}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           <label className="flex items-start gap-2 text-xs text-gray-600 cursor-pointer">
             <input

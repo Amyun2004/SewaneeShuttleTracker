@@ -20,12 +20,17 @@ export interface LoginIn {
   mode: "rider" | "staff";
 }
 
+/** Signup role choice. Backend maps student/staff → rider, driver → driver. */
+export type RegisterRole = "student" | "staff" | "driver";
+
 export interface RegisterIn {
   username: string;
+  first_name: string;
+  last_name: string;
   email: string;
-  name: string;
   password: string;
-  agreed_to_terms: boolean;
+  role: RegisterRole;
+  terms: boolean;
 }
 
 export interface LiveShuttle {
