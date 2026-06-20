@@ -14,7 +14,7 @@
 //
 // On error or `endTrip()`, POST /api/trips/{id}/end and tear down.
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api } from "@/api/client";
+import { api, ApiError } from "@/api/client";
 import { haversineMeters } from "@/lib/distance";
 
 export type TripState =
@@ -106,11 +106,33 @@ export function useTrip() {
       lastPingedAtRef.current = 0;
       lastPositionRef.current = null;
 
+      // POST /start, recovering from the "you already have an active trip"
+      // 409. That fires when a previous trip never got cleanly ended (app
+      // closed mid-trip, phone died, connection dropped on End). The backend
+      // names the orphan's id in the message — "...active trip (#42)" — so we
+      // parse it, end that trip, then retry the start once.
+      async function createTrip(): Promise<TripSummary> {
+        const body = { route_id, shuttle_id };
+        try {
+          return await api.post<TripSummary>("/api/trips/start", body);
+        } catch (err) {
+          if (err instanceof ApiError && err.status === 409) {
+            const match = err.message.match(/#(\d+)/);
+            if (match) {
+              try {
+                await api.post(`/api/trips/${match[1]}/end`);
+              } catch {
+                // Couldn't end the orphan — fall through and rethrow below.
+              }
+              return await api.post<TripSummary>("/api/trips/start", body);
+            }
+          }
+          throw err;
+        }
+      }
+
       try {
-        const t = await api.post<TripSummary>("/api/trips/start", {
-          route_id,
-          shuttle_id,
-        });
+        const t = await createTrip();
         setTrip(t);
         tripIdRef.current = t.trip_id;
         setStartedAt(Date.now());
