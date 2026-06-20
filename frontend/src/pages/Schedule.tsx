@@ -18,6 +18,7 @@ import {
   TILE_URL,
 } from "@/lib/map";
 import { cn } from "@/lib/cn";
+import {InvalidateSize} from "@/components/map/InvalidateSize";
 
 export function Schedule() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -159,6 +160,7 @@ function RouteBody({ detail }: { detail: RouteDetail }) {
           scrollWheelZoom={false}
         >
           <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} />
+          <InvalidateSize />
           <FitBounds points={stopPoints} />
           {detail.stops.map((s, i) => (
             <Marker

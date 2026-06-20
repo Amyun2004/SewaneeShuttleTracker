@@ -19,6 +19,7 @@ import { useTrip } from "@/hooks/useTrip";
 import { useWakeLock } from "@/hooks/useWakeLock";
 import { shuttleIcon, userIcon } from "@/components/map/markers";
 import { PanTo } from "@/components/map/PanTo";
+import {InvalidateSize} from "@/components/map/InvalidateSize";
 import {
   DEFAULT_ZOOM,
   SEWANEE_CENTER,
@@ -292,6 +293,7 @@ function ActiveTripView({
           scrollWheelZoom
         >
           <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} />
+          <InvalidateSize />
           <PanTo target={current ? [current.latitude, current.longitude] : null} />
           {polylinePoints.length > 1 && (
             <Polyline

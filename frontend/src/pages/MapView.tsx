@@ -20,7 +20,7 @@ import {
   TILE_ATTRIBUTION,
 } from "@/lib/map";
 import { cn } from "@/lib/cn";
-
+import { InvalidateSize } from "@/components/map/InvalidateSize";
 export function MapView() {
   const { fix, status } = useGeolocation();
   const { shuttles, connection } = useLiveShuttles();
@@ -203,6 +203,7 @@ export function MapView() {
           scrollWheelZoom
         >
           <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} />
+          <InvalidateSize />
           <PanTo target={panTarget} zoom={16} />
 
           {fix && (
