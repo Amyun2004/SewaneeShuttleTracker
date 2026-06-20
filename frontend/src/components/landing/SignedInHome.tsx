@@ -8,14 +8,15 @@
 // admin clicks "+ Post alert", same UX as the admin dashboard.
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
+import { api, ApiError } from "@/api/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/api/client";
 import type { NearestShuttle, PublicAlert, Severity } from "@/api/types";
 import { useAuth } from "@/auth/AuthContext";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { cn } from "@/lib/cn";
 import { formatTripDate } from "@/lib/datetime";
 
+import type { IncidentCategory, NearestShuttle, PublicAlert, Severity } from "@/api/types";
 interface SignedInHomeProps {
   isAdmin: boolean;
 }
@@ -38,6 +39,7 @@ export function SignedInHome({ isAdmin }: SignedInHomeProps) {
 
       <AlertsBlock isAdmin={isAdmin} />
       <NearestShuttleBlock />
+      <IncidentReportBlock />
       <QuickLinks isAdmin={isAdmin} />
     </div>
   );
@@ -441,5 +443,193 @@ function QuickLink({
       <p className="font-bold text-gray-900 text-sm">{label}</p>
       <p className="text-xs text-gray-500 mt-0.5">{hint}</p>
     </Link>
+  );
+}
+
+/* ============================================================ */
+
+const INCIDENT_CATEGORIES: { value: IncidentCategory; label: string }[] = [
+  { value: "shuttle", label: "Shuttle problem (late, broken, etc.)" },
+  { value: "stop", label: "Stop issue (sign, lighting, safety)" },
+  { value: "driver", label: "Driver concern" },
+  { value: "safety", label: "Safety / harassment" },
+  { value: "other", label: "Other" },
+];
+
+function IncidentReportBlock() {
+  const [open, setOpen] = useState(false);
+  const [done, setDone] = useState(false);
+
+  return (
+    <section>
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+          Something wrong?
+        </p>
+        {!done && (
+          <button
+            type="button"
+            onClick={() => setOpen((o) => !o)}
+            className="px-3 py-1 rounded-md text-xs font-bold bg-sewanee-purple text-white hover:bg-sewanee-purple-light transition"
+          >
+            {open ? "Cancel" : "⚠ Report an issue"}
+          </button>
+        )}
+      </div>
+
+      {done ? (
+        <div className="rounded-2xl border border-green-200 bg-green-50 px-4 py-5 text-center">
+          <div className="text-2xl mb-1">✅</div>
+          <p className="text-sm font-bold text-gray-900">Report submitted</p>
+          <p className="text-xs text-gray-500 mt-1">
+            Thanks — transit admins will review it.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setDone(false);
+              setOpen(false);
+            }}
+            className="mt-3 text-xs font-semibold text-sewanee-purple hover:underline"
+          >
+            Report another
+          </button>
+        </div>
+      ) : open ? (
+        <IncidentForm
+          onCancel={() => setOpen(false)}
+          onSubmitted={() => setDone(true)}
+        />
+      ) : (
+        <div className="bg-white rounded-2xl border border-gray-100 px-4 py-4">
+          <p className="text-sm text-gray-500">
+            Spot a problem with a shuttle, a stop, or a driver? Let the transit
+            team know.
+          </p>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function IncidentForm({
+  onCancel,
+  onSubmitted,
+}: {
+  onCancel: () => void;
+  onSubmitted: () => void;
+}) {
+  const [category, setCategory] = useState<IncidentCategory | "">("");
+  const [location, setLocation] = useState("");
+  const [description, setDescription] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  const createMut = useMutation({
+    mutationFn: () =>
+      api.post("/api/incidents", {
+        category,
+        location: location.trim() || null,
+        description: description.trim(),
+      }),
+    onSuccess: () => onSubmitted(),
+    onError: (err) =>
+      setError(
+        err instanceof ApiError
+          ? err.message || "Couldn't submit your report."
+          : "Network error. Try again."
+      ),
+  });
+
+  const ready =
+    category !== "" && description.trim().length >= 10 && !createMut.isPending;
+
+  function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError(null);
+    if (ready) createMut.mutate();
+  }
+
+  return (
+    <form
+      onSubmit={onSubmit}
+      className="bg-white rounded-2xl border border-gray-200 p-4 space-y-3"
+    >
+      <div>
+        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+          Category
+        </label>
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value as IncidentCategory | "")}
+          required
+          className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sewanee-purple/30 focus:border-sewanee-purple"
+        >
+          <option value="">Select a category…</option>
+          {INCIDENT_CATEGORIES.map((c) => (
+            <option key={c.value} value={c.value}>
+              {c.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+          Location{" "}
+          <span className="text-gray-300 normal-case font-normal">(optional)</span>
+        </label>
+        <input
+          type="text"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          maxLength={120}
+          placeholder="e.g. Near McClurg, around 3:15 PM"
+          className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-sewanee-purple/30 focus:border-sewanee-purple"
+        />
+      </div>
+
+      <div>
+        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+          Description
+        </label>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={4}
+          minLength={10}
+          maxLength={1000}
+          placeholder="Tell us what happened…"
+          className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-sewanee-purple/30 focus:border-sewanee-purple resize-none"
+        />
+        <p className="text-[11px] text-gray-400 mt-1">
+          {description.trim().length < 10
+            ? `At least 10 characters (${description.trim().length}/10).`
+            : `${description.length}/1000`}
+        </p>
+      </div>
+
+      {error && (
+        <div className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
+      <div className="flex items-center justify-end gap-2">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-3 py-1.5 text-xs font-semibold text-gray-500 hover:text-gray-700"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          disabled={!ready}
+          className="px-3 py-1.5 rounded-md text-xs font-bold bg-sewanee-purple text-white hover:bg-sewanee-purple-light transition disabled:opacity-50"
+        >
+          {createMut.isPending ? "Submitting…" : "Submit report"}
+        </button>
+      </div>
+    </form>
   );
 }
