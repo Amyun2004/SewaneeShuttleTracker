@@ -9,6 +9,11 @@ export function PublicHero() {
         <div className="absolute inset-0 bg-gradient-to-b from-sewanee-navy/70 via-sewanee-purple/40 to-sewanee-navy/90" />
 
         <div className="relative max-w-6xl mx-auto px-6 py-24 md:py-32 text-center">
+          <img
+            src="/bus-icon.png"
+            alt="Sewanee Transit"
+            className="w-50 h-50 mx-auto mb-1 drop-shadow-lg"
+          />
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6">
             <span className="w-2 h-2 rounded-full bg-sewanee-gold animate-pulse" />
             <span className="text-white/90 text-xs font-semibold uppercase tracking-widest">
