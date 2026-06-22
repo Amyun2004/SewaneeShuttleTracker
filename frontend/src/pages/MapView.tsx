@@ -8,10 +8,10 @@ import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import type { LatLngExpression } from "leaflet";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/api/client";
-import type { NearestShuttle } from "@/api/types";
+import type { NearestShuttle, Stop } from "@/api/types";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useLiveShuttles } from "@/hooks/useLiveShuttles";
-import { shuttleIcon, userIcon } from "@/components/map/markers";
+import { shuttleIcon, stopDotIcon, userIcon } from "@/components/map/markers";
 import { PanTo } from "@/components/map/PanTo";
 import {
   SEWANEE_CENTER,
@@ -45,6 +45,13 @@ export function MapView() {
     enabled: !!fix && shuttles.length > 0,
     staleTime: 10_000,
   });
+  // Campus stops — static for the session, so fetch once and cache hard.
+  const stopsQuery = useQuery<Stop[]>({
+    queryKey: ["stops"],
+    queryFn: () => api.get<Stop[]>("/api/stops"),
+    staleTime: Infinity,
+  });
+  const stops = stopsQuery.data ?? [];
 
   function centerOnMe() {
     if (fix) setPanTarget([fix.latitude, fix.longitude]);
@@ -205,6 +212,26 @@ export function MapView() {
           <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} />
           <InvalidateSize />
           <PanTo target={panTarget} zoom={16} />
+          {stops.map((st) => (
+            <Marker
+              key={`stop-${st.stop_id}`}
+              position={[st.latitude, st.longitude]}
+              icon={stopDotIcon}
+              zIndexOffset={-1000}
+            >
+              <Popup>
+                <div className="text-xs">
+                  <p className="font-bold text-sm">{st.stop_name}</p>
+                  <p className="text-gray-500 uppercase tracking-wide text-[10px] mt-0.5">
+                    Shuttle stop
+                  </p>
+                  {st.description && (
+                    <p className="text-gray-500 mt-1">{st.description}</p>
+                  )}
+                </div>
+              </Popup>
+            </Marker>
+          ))}
 
           {fix && (
             <Marker

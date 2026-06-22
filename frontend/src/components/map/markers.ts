@@ -56,3 +56,23 @@ export function stopIcon(label: string | number): L.DivIcon {
     `,
   });
 }
+
+/**
+ * Static stop marker for the live map. Unlike stopIcon() (numbered, for a
+ * single ordered route), campus stops here have no sequence — so a plain
+ * pin. White fill + purple ring keeps it distinct from the solid-purple
+ * user dot and the gold shuttle markers.
+ */
+export const stopDotIcon = L.divIcon({
+  className: "",
+  iconSize: [18, 18],
+  iconAnchor: [9, 9],
+  html: `
+    <div style="
+      width: 18px; height: 18px; border-radius: 50%;
+      background: white;
+      border: 3px solid #582C83;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    "></div>
+  `,
+});
