@@ -40,10 +40,8 @@ rewrite is tracked on `phase-2-frontend` (next).
 
 ## Highlights
 
-**Single-query nearest-shuttle.** The original Flask app pulled every
-live shuttle from MySQL and looped over them in Python computing
-Haversine distance. The rewrite does the entire calculation — distance,
-bearing, K-nearest ordering — in one indexed PostGIS query that stays
+**Single-query nearest-shuttle.** The rewrite does the entire calculation: distance,
+bearing, K-nearest ordering,  in one indexed PostGIS query that stays
 fast as the fleet grows.
 
 **Sub-second live tracking.** Drivers `POST /api/trips/{id}/ping` every
