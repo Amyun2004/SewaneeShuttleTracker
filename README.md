@@ -29,7 +29,7 @@ rewrite is tracked on `phase-2-frontend` (next).
 - PostgreSQL 16 with PostGIS 3.4
 - `geography(Point, 4326)` columns with GiST indexes for spatial queries
 - `ST_Distance`, `ST_Azimuth`, and KNN (`<->`) operators do the geo math
-  in SQL — no Haversine loops in Python
+  in SQL -- no Haversine loops in Python
 
 **Tooling**
 - Docker for the local Postgres + PostGIS environment
