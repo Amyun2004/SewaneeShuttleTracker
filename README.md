@@ -57,8 +57,7 @@ protected route declares its required role at the function signature.
 
 **Schema, not strings.** Every endpoint validates input through a
 Pydantic schema; FastAPI rejects malformed payloads with a structured
-422 before any route code runs. Replaces hand-rolled regex/length checks
-sprinkled through the old Flask views.
+422 before any route code runs.
 
 ---
 
