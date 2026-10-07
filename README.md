@@ -46,8 +46,7 @@ fast as the fleet grows.
 
 **Sub-second live tracking.** Drivers `POST /api/trips/{id}/ping` every
 few seconds. The server inserts the location row and immediately
-broadcasts the ping over WebSockets to every connected rider. Replaces
-the 5-second polling loop in the original app.
+broadcasts the ping over WebSockets to every connected rider.
 
 **Defense-in-depth auth.** Argon2id (PHC winner) for password storage
 with transparent rehash-on-login when parameters get upgraded. JWT
