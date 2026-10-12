@@ -13,23 +13,20 @@
 const BASE = (import.meta.env.VITE_API_BASE ?? "").replace(/\/$/, "");
 
 export class ApiError extends Error {
-  constructor(
-    public readonly status: number,
-    public readonly detail: unknown,
-    message?: string
-  ) {
+  readonly status: number;
+  readonly detail: unknown;
+
+  constructor(status: number, detail: unknown, message?: string) {
     super(message ?? `HTTP ${status}`);
     this.name = "ApiError";
+    this.status = status;
+    this.detail = detail;
   }
 
-  /** True when the server says "you're not logged in" or "you're logged in
-   *  but lack the required role." Used by AuthContext to invalidate the
-   *  cached user. */
   get isAuthError(): boolean {
     return this.status === 401 || this.status === 403;
   }
 }
-
 interface RequestOptions extends Omit<RequestInit, "body"> {
   /** If provided, sent as JSON. Don't set Content-Type manually. */
   json?: unknown;

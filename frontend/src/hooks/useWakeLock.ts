@@ -4,19 +4,6 @@
 // case is the screen sleeps and the driver taps to wake it.
 import { useEffect } from "react";
 
-declare global {
-  interface WakeLockSentinel extends EventTarget {
-    released: boolean;
-    type: "screen";
-    release: () => Promise<void>;
-  }
-  interface Navigator {
-    wakeLock?: {
-      request: (type: "screen") => Promise<WakeLockSentinel>;
-    };
-  }
-}
-
 export function useWakeLock(active: boolean) {
   useEffect(() => {
     if (!active || !navigator.wakeLock) return;

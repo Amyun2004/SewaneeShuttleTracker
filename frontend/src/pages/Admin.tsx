@@ -7,7 +7,7 @@
 // All sections use the same single /api/admin/dashboard payload — one
 // fetch, refetched every 30 seconds via TanStack Query. Incident and
 // alert mutations invalidate this query so the UI refreshes automatically.
-import { useMemo, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import { api } from "@/api/client";

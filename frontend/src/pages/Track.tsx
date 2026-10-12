@@ -17,7 +17,7 @@ import { api } from "@/api/client";
 import type { RouteSummary, ShuttleSummary } from "@/api/types";
 import { useTrip } from "@/hooks/useTrip";
 import { useWakeLock } from "@/hooks/useWakeLock";
-import { shuttleIcon, userIcon } from "@/components/map/markers";
+import { shuttleIcon } from "@/components/map/markers";
 import { PanTo } from "@/components/map/PanTo";
 import {InvalidateSize} from "@/components/map/InvalidateSize";
 import {

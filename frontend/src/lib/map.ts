@@ -1,6 +1,6 @@
 // Map constants. Keeping them in one file so we don't have lat/lng
 // scattered through components.
-import { LatLngExpression } from "leaflet";
+import type { LatLngExpression } from "leaflet";
 
 /** Sewanee campus rough center — fallback when geolocation isn't available. */
 export const SEWANEE_CENTER: LatLngExpression = [35.2046, -85.9213];
