@@ -29,7 +29,7 @@ rewrite is tracked on `phase-2-frontend` (next).
 - PostgreSQL 16 with PostGIS 3.4
 - `geography(Point, 4326)` columns with GiST indexes for spatial queries
 - `ST_Distance`, `ST_Azimuth`, and KNN (`<->`) operators do the geo math
-  in SQL — no Haversine loops in Python
+  in SQL -- no Haversine loops in Python
 
 **Tooling**
 - Docker for the local Postgres + PostGIS environment
@@ -40,16 +40,13 @@ rewrite is tracked on `phase-2-frontend` (next).
 
 ## Highlights
 
-**Single-query nearest-shuttle.** The original Flask app pulled every
-live shuttle from MySQL and looped over them in Python computing
-Haversine distance. The rewrite does the entire calculation — distance,
-bearing, K-nearest ordering — in one indexed PostGIS query that stays
+**Single-query nearest-shuttle.** The rewrite does the entire calculation: distance,
+bearing, K-nearest ordering,  in one indexed PostGIS query that stays
 fast as the fleet grows.
 
 **Sub-second live tracking.** Drivers `POST /api/trips/{id}/ping` every
 few seconds. The server inserts the location row and immediately
-broadcasts the ping over WebSockets to every connected rider. Replaces
-the 5-second polling loop in the original app.
+broadcasts the ping over WebSockets to every connected rider.
 
 **Defense-in-depth auth.** Argon2id (PHC winner) for password storage
 with transparent rehash-on-login when parameters get upgraded. JWT
@@ -60,8 +57,7 @@ protected route declares its required role at the function signature.
 
 **Schema, not strings.** Every endpoint validates input through a
 Pydantic schema; FastAPI rejects malformed payloads with a structured
-422 before any route code runs. Replaces hand-rolled regex/length checks
-sprinkled through the old Flask views.
+422 before any route code runs.
 
 ---
 
