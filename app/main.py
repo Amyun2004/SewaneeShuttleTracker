@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
     # Place for startup/shutdown work (warm caches, etc.) if needed later.
     yield
 
-
+#Framework
 app = FastAPI(
     title="Sewanee Transit API",
     version="0.1.0",
@@ -27,6 +27,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+#browser security Add on
 # CORS: lets the Phase 2 frontend at localhost:5173 call this API
 # with cookies. Tight allow-list, no wildcards.
 app.add_middleware(
@@ -44,7 +45,6 @@ app.include_router(history.router,  prefix="/api/history",  tags=["history"])
 app.include_router(admin.router,    prefix="/api/admin",    tags=["admin"])
 app.include_router(misc.router,     prefix="/api",          tags=["misc"])
 app.include_router(ws.router,       prefix="/ws",           tags=["ws"])
-
 
 @app.get("/api/health")
 async def health():
