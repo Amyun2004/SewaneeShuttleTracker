@@ -1,44 +1,48 @@
-"""Settings loaded from .env via pydantic-settings.
-
-Importing `settings` anywhere in the app gives you typed access to every
-config value with validation, defaults, and a single source of truth.
 """
-from functools import lru_cache
+config does these:
+puling from the .env the following: 
+model configuration
+database configuration
+Cors configuration
+http configuration
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
+converting cors stro to list
+
+running the settings
+
+"""
+
+from pydantic_settings import SettingsConfigDict, BaseSettings
+from functools import lru_cache
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(env_file=".env", extra = 'ignore')
 
-    # --- database ---
-    database_url: str = (
-        "postgresql+asyncpg://postgres:postgres@localhost:5432/sewanee_transit"
-    )
+    #database configuration 
+    database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/sewanee_transit"
 
-    # --- auth ---
+    #Cors configuration 
+    cors_origins: str = "http://localhost:5173,http://localhost:3000"
+
     jwt_secret: str = "dev-change-me"
     jwt_algorithm: str = "HS256"
     access_token_minutes: int = 15
-    refresh_token_days: int = 7
+    refresh_token_days: int = 7 
 
-    # --- http ---
-    cors_origins: str = "http://localhost:5173"
+    #http configuration and cookies configuraiton 
     cookie_secure: bool = False
     cookie_domain: str | None = None
 
-    # --- misc ---
+    #misc configuration 
     env: str = "development"
 
-    @property
+    @property 
     def cors_origin_list(self) -> list[str]:
-        """Split the comma-separated CORS_ORIGINS env var into a list."""
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
-
 
 @lru_cache
 def get_settings() -> Settings:
-    """Cached so .env is only parsed once per process."""
     return Settings()
 
 
