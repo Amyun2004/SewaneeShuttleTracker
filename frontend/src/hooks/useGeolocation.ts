@@ -19,14 +19,12 @@ export type GeoStatus = "idle" | "acquiring" | "ok" | "denied" | "unavailable";
 
 export function useGeolocation() {
   const [fix, setFix] = useState<GeoFix | null>(null);
-  const [status, setStatus] = useState<GeoStatus>("idle");
+    const [status, setStatus] = useState<GeoStatus>(() =>
+    "geolocation" in navigator ? "acquiring" : "unavailable"
+  );
 
   useEffect(() => {
-    if (!("geolocation" in navigator)) {
-      setStatus("unavailable");
-      return;
-    }
-    setStatus("acquiring");
+    if (!("geolocation" in navigator)) return;
 
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {

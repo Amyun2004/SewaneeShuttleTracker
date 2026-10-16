@@ -5,7 +5,7 @@
 // The backend's /api/history returns trips PLUS routes/shuttles in one
 // payload, so we don't need separate /api/routes or /api/shuttles
 // calls here — one query, one re-fetch when filters change.
-import { useEffect, useMemo, useState } from "react";
+ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   MapContainer,
@@ -46,24 +46,17 @@ export function History() {
     },
   });
 
-  const trips = historyQuery.data?.trips ?? [];
+  const trips = useMemo(
+    () => historyQuery.data?.trips ?? [],
+    [historyQuery.data]
+  );
   const routes = historyQuery.data?.routes ?? [];
   const shuttles = historyQuery.data?.shuttles ?? [];
 
-  // Auto-select the first trip whenever the filter result set changes,
-  // so the map preview isn't empty on a fresh visit.
-  useEffect(() => {
-    if (trips.length === 0) {
-      setSelectedTripId(null);
-      return;
-    }
-    if (!trips.find((t) => t.trip_id === selectedTripId)) {
-      setSelectedTripId(trips[0].trip_id);
-    }
-  }, [trips, selectedTripId]);
-
+    // The clicked trip if it's still in the filtered results, otherwise the
+  // first trip, so the map preview isn't empty on a fresh visit.
   const selectedTrip = useMemo(
-    () => trips.find((t) => t.trip_id === selectedTripId) ?? null,
+    () => trips.find((t) => t.trip_id === selectedTripId) ?? trips[0] ?? null,
     [trips, selectedTripId]
   );
 
@@ -152,7 +145,7 @@ export function History() {
                 <li key={t.trip_id}>
                   <TripCard
                     trip={t}
-                    active={t.trip_id === selectedTripId}
+                    active={t.trip_id === selectedTrip?.trip_id}
                     onClick={() => setSelectedTripId(t.trip_id)}
                   />
                 </li>

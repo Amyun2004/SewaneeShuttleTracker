@@ -110,7 +110,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
-
+// Hook lives next to its Provider on purpose; fast refresh still works for
+// the Provider, it just does a full reload when this hook changes.
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
   if (!ctx) {
