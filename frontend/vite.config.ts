@@ -11,9 +11,8 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      // favicon.svg + bus-icon.png already live in public/, so list them
-      // as includeAssets (copied as-is) rather than generating new ones.
-      includeAssets: ['favicon.svg', 'bus-icon.png', 'bus-icon.ico'],
+      // Static files in public/ that the service worker should precache.
+      includeAssets: ['bus-icon.png', 'bus-icon.ico', 'apple-touch-icon-180x180.png'],
       manifest: {
         name: 'Sewanee Transit',
         short_name: 'Transit',
@@ -26,16 +25,22 @@ export default defineConfig({
         scope: '/',
         icons: [
           {
-            src: '/bus-icon.png',
-            sizes: '256x256',
+            src: '/pwa-192x192.png',
+            sizes: '192x192',
             type: 'image/png',
             purpose: 'any',
           },
           {
-            src: '/favicon.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
-            purpose: 'any maskable',
+            src: '/pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: '/maskable-icon-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
           },
         ],
       },
