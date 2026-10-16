@@ -54,6 +54,7 @@ export function Track() {
         pingCount={pingCount}
         elapsedMs={elapsedMs}
         ending={state === "ending"}
+        warning={error}
         onEnd={endTrip}
       />
     );
@@ -244,6 +245,7 @@ function ActiveTripView({
   pingCount,
   elapsedMs,
   ending,
+  warning,
   onEnd,
 }: {
   current: ReturnType<typeof useTrip>["current"];
@@ -252,6 +254,7 @@ function ActiveTripView({
   pingCount: number;
   elapsedMs: number;
   ending: boolean;
+  warning: string | null ;
   onEnd: () => void;
 }) {
   const center: LatLngExpression = current
@@ -283,7 +286,11 @@ function ActiveTripView({
           {pingCount} pings sent
         </span>
       </div>
-
+      {warning && (
+        <div className="px-4 sm:px-6 py-2 bg-sewanee-gold/20 text-sewanee-gold text-xs font-semibold">
+          {warning}
+        </div>
+      )}
       {/* Map */}
       <div className="flex-grow relative">
         <MapContainer

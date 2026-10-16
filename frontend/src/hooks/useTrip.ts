@@ -155,6 +155,7 @@ export function useTrip() {
             };
             lastFixRef.current = fix;
             setCurrent(fix);
+            setError(null);
 
             // Accumulate distance from previous accepted fix.
             const last = lastPositionRef.current;
@@ -183,12 +184,16 @@ export function useTrip() {
             flushPing();
           },
           (err) => {
-            setError(
-              err.code === 1
-                ? "Location permission denied."
-                : "Couldn't get GPS fix."
-            );
-            setState("error");
+            // PERMISSION_DENIED = 1 is the only error that ends the trip.
+            if (err.code === 1) {
+              setError("Location permission denied.");
+              setState("error");
+              return;
+            }
+            // TIMEOUT / POSITION_UNAVAILABLE: no new fix yet (shuttle parked
+            // at a stop, weak signal). The watch keeps running and pings
+            // resume with the next fix, so stay in the trip and just warn.
+            setError("Weak GPS signal. Still trying…");
           },
           {
             enableHighAccuracy: true,
