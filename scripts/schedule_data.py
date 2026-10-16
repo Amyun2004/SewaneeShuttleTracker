@@ -15,22 +15,22 @@ runs that leave after midnight go past 1440 (12:08 am Friday night is
 #       real pickup spots.
 # ---------------------------------------------------------------------------
 STOPS = [
-    ("TWC Parking Lot",                  35.204600, -85.921300, "Every loop starts and ends here."),
+    ("TWC Parking Lot",                  35.195725, -85.925537, "Every loop starts and ends here."),
     ("Gorgas / Quintard",                35.205600, -85.921300, None),
     ("Classics House",                   35.205500, -85.920600, "Stop is near the Classics House."),
-    ("Hodgson Hill",                     35.205100, -85.920100, None),
-    ("Biehl Commons",                    35.204500, -85.919900, None),
-    ("Fowler",                           35.203900, -85.920200, None),
-    ("French House",                     35.203500, -85.920800, None),
-    ("Woodlands",                        35.203300, -85.921500, None),
+    ("Hodgson Hill",                     35.204750, -85.926639, None),
+    ("Biehl Commons",                    35.203962, -85.921036, None),
+    ("Fowler",                           35.208361, -85.919444, None),
+    ("French House",                     35.209945, -85.920826, None),
+    ("Woodlands",                        35.214305, -85.920879, None),
     ("Crafting Guild / Fine Arts Houses", 35.203500, -85.922200, None),
-    ("Tennis Courts",                    35.203900, -85.922800, None),
+    ("Tennis Courts",                    35.209737, -85.915146, None),
     ("Zone C Parking Lot",               35.204500, -85.923100, None),
-    ("Trezvant",                         35.205100, -85.923000, None),
-    ("Humphreys",                        35.205600, -85.922600, None),
-    ("The BC",                           35.206000, -85.922000, None),
-    ("Wellness Commons",                 35.206300, -85.921300, None),
-    ("Village (near Regions Bank)",      35.206600, -85.920500, None),
+    ("Trezvant",                         35.205400, -85.912612, None),
+    ("Humphreys",                        35.204839, -85.915458, None),
+    ("The BC",                           35.205017, -85.918218, None),
+    ("Wellness Commons",                 35.202513, -85.921179, None),
+    ("Village (near Regions Bank)",      35.202704, -85.921076, None),
 ]
 
 # ---------------------------------------------------------------------------
