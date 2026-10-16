@@ -9,7 +9,7 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "@/auth/AuthContext";
 import type { Role } from "@/api/types";
 import { cn } from "@/lib/cn";
-
+import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 const RIDER_NAV = [
   { to: "/", label: "Home" },
   { to: "/map", label: "Live Map" },
@@ -44,12 +44,16 @@ export function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
+  const { canInstall, install } = useInstallPrompt();
 
-  // Close the menus on route change.
-  useEffect(() => {
+  // Close the menus on route change. Comparing against the previous path
+  // during render (instead of in an effect) avoids an extra render pass.
+  const [prevPath, setPrevPath] = useState(location.pathname);
+  if (prevPath !== location.pathname) {
+    setPrevPath(location.pathname);
     setMobileOpen(false);
     setUserMenuOpen(false);
-  }, [location.pathname]);
+  }
 
   // Close avatar dropdown on outside click.
   useEffect(() => {
@@ -117,6 +121,15 @@ export function Header() {
 
         {/* Right side */}
         <div className="flex items-center gap-2">
+          {canInstall && (
+            <button
+              type="button"
+              onClick={() => install()}
+              className="hidden md:inline-flex items-center px-3 py-1.5 rounded-lg border border-sewanee-gold/50 text-sewanee-gold text-sm font-semibold hover:bg-white/10 transition"
+            >
+              Install app
+            </button>
+          )}
           {user && badge ? (
             <>
               <span
@@ -278,6 +291,15 @@ export function Header() {
             )}
 
             <div className="pt-3 mt-3 border-t border-white/10 space-y-2">
+              {canInstall && (
+                <button
+                  type="button"
+                  onClick={() => install()}
+                  className="block w-full text-left px-4 py-3 rounded-xl text-sewanee-gold font-semibold text-base hover:bg-white/10 transition"
+                >
+                  Install app
+                </button>
+              )}
               {user ? (
                 <>
                   <div className="px-4 py-2">
