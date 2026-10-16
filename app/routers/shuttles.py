@@ -86,6 +86,7 @@ async def nearest(
     miles = distance_m / 1609.34
     speed = row["speed_mph"]
     eta = max(1, round(miles / speed * 60)) if (speed and speed > 1) else None
+    bearing = row["bearing"]
 
     return NearestShuttle(
         shuttle_id=row["shuttle_id"],
@@ -100,7 +101,7 @@ async def nearest(
         distance_m=distance_m,
         distance_miles=round(miles, 2),
         distance_feet=round(distance_m * 3.28084),
-        bearing=(float(row["bearing"]) + 360) % 360,
+        bearing=(float(bearing) + 360) % 360 if bearing is not None else 0.0,
         walking_minutes=max(1, round(miles / 3 * 60)),
         shuttle_eta_minutes=eta,
     )
