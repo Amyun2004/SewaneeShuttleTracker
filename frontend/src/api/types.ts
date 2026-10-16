@@ -200,3 +200,8 @@ export interface AdminDashboard {
   alerts: AdminAlert[];
   recent_trips: AdminRecentTrip[];
 }
+
+export interface ShuttleSummary {
+  shuttle_id: number;
+  shuttle_name: string;
+}
