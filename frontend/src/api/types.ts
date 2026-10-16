@@ -67,6 +67,17 @@ export interface Stop {
   description: string | null;
   sequence_number: number | null;
   expected_min_from_start: number | null;
+  /** True for stops only the last run before a break drives to. */
+  extension_only?: boolean;
+}
+
+export interface ScheduleRun {
+  run_id: number;
+  /** Minutes after midnight of the service day; past 1440 = after midnight. */
+  start_minutes: number;
+  /** ISO weekdays, 1 = Monday ... 7 = Sunday. */
+  service_days: number[];
+  includes_extension: boolean;
 }
 
 export interface RouteDetail {
@@ -74,6 +85,7 @@ export interface RouteDetail {
   route_name: string;
   description: string | null;
   stops: Stop[];
+  runs: ScheduleRun[];
 }
 
 export interface HistoryTrip {
