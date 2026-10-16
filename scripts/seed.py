@@ -110,25 +110,31 @@ async def seed():
             "SELECT stop_name, stop_id FROM stops"
         ))).all())
 
-        route_stops_data = [
-            ("Daytime Loop",        "McClurg Dining Hall", 1,  0),
-            ("Daytime Loop",        "duPont Library",      2,  5),
-            ("Daytime Loop",        "Spencer Hall",        3, 10),
-            ("Daytime Loop",        "Quintard Hall",       4, 18),
-            ("Daytime Loop",        "Hodson Hill",         5, 26),
-            ("Weekend Night Route", "McClurg Dining Hall", 1,  0),
-            ("Weekend Night Route", "Sewanee Inn",         2,  6),
-            ("Weekend Night Route", "Sewanee Market",      3, 11),
-            ("Weekend Night Route", "Shenanigans",         4, 15),
-            ("Weekend Night Route", "Hodson Hill",         5, 22),
+                # (route, stops in order, extension stops)
+        layouts = [
+            (sched.DAYTIME, sched.DAYTIME_STOPS, sched.DAYTIME_EXTENSION),
+            (sched.NIGHT,   sched.NIGHT_STOPS,   []),
         ]
-        for rname, sname, seq, mins in route_stops_data:
-            db.add(RouteStop(
-                route_id=route_ids[rname], stop_id=stop_ids[sname],
-                sequence_number=seq, expected_min_from_start=mins,
-            ))
+        for rname, regular, extension in layouts:
+            ordered = [(s, m, False) for s, m in regular] + [
+                (s, m, True) for s, m in extension
+            ]
+            for seq, (sname, mins, ext) in enumerate(ordered, start=1):
+                db.add(RouteStop(
+                    route_id=route_ids[rname], stop_id=stop_ids[sname],
+                    sequence_number=seq, expected_min_from_start=mins,
+                    extension_only=ext,
+                ))
         await db.flush()
         print(" route_stops inserted", flush=True)
+
+        for rname, start, days, ext in sched.RUNS:
+            db.add(ScheduleRun(
+                route_id=route_ids[rname], start_minutes=start,
+                service_days=days, includes_extension=ext,
+            ))
+        await db.flush()
+        print(" schedule_runs inserted", flush=True)
 
         pgarcia, admin = users[2], users[3]
         T1, T2 = pgarcia.user_id, admin.user_id

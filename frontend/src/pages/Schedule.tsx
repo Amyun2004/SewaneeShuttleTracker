@@ -243,8 +243,10 @@ function NextBanner({
   const time = formatClock(next.run.start_minutes);
   const leavesOn = ((isoWeekday(now) - 1 + next.daysAhead) % 7) + 1;
   const when =
-    next.minutesAway < 12 * 60
-      ? formatWait(next.minutesAway)
+  next.minutesAway < 12 * 60
+    ? formatWait(next.minutesAway)
+    : next.daysAhead === 0
+      ? "today"
       : next.daysAhead === 1
         ? "tomorrow"
         : `on ${dayName(leavesOn)}`;
