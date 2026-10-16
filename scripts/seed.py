@@ -14,22 +14,25 @@ from sqlalchemy import text
 
 from app.database import SessionLocal
 from app.models import (
-    Alert, Incident, Route, RouteStop, Shuttle, Trip, User, UserRole,
+    Alert, Incident, Route, RouteStop, ScheduleRun, Shuttle, Trip, User,
+    UserRole,
 )
 from app.security import hash_password
+from scripts import schedule_data as sched
+
 
 
 SEED_PASSWORD = "Password1"
 
 
 async def seed():
-    print("→ entered seed()", flush=True)
+    print(" entered seed()", flush=True)
     async with SessionLocal() as db:
-        print("→ session opened", flush=True)
+        print("session opened", flush=True)
 
         for tbl in (
             "alerts", "incidents", "locations", "trips",
-            "route_stops", "stops", "routes", "shuttles",
+            "schedule_runs", "route_stops", "stops", "routes", "shuttles",
             "user_roles", "users",
         ):
             print(f"  truncating {tbl}...", flush=True)
@@ -37,10 +40,10 @@ async def seed():
                 f'TRUNCATE TABLE {tbl} RESTART IDENTITY CASCADE'
             ))
         await db.commit()
-        print("→ truncate done", flush=True)
+        print(" truncate done", flush=True)
 
         pw = hash_password(SEED_PASSWORD)
-        print("→ password hashed", flush=True)
+        print(" password hashed", flush=True)
 
         users = [
             User(username="jsmith1",  password_hash=pw,
@@ -54,7 +57,7 @@ async def seed():
         ]
         db.add_all(users)
         await db.flush()
-        print("→ users inserted", flush=True)
+        print(" users inserted", flush=True)
 
         role_assignments = [
             (users[0], "rider"),
@@ -65,7 +68,7 @@ async def seed():
         for u, role in role_assignments:
             db.add(UserRole(user_id=u.user_id, role=role))
         await db.flush()
-        print("→ roles inserted", flush=True)
+        print(" roles inserted", flush=True)
 
         shuttles = [
             Shuttle(shuttle_name="Tiger-1", license_plate="TN-ABC123",
@@ -75,31 +78,17 @@ async def seed():
         ]
         db.add_all(shuttles)
         await db.flush()
-        print("→ shuttles inserted", flush=True)
+        print(" shuttles inserted", flush=True)
 
         routes = [
-            Route(route_name="Daytime Loop",
-                  description="Weekday daytime shuttle around central campus and residence halls.",
-                  is_active=True),
-            Route(route_name="Weekend Night Route",
-                  description="Friday and Saturday evening route serving the Village and Shenanigans.",
-                  is_active=True),
+            Route(route_name=name, description=desc, is_active=True)
+            for name, desc in sched.ROUTES
         ]
         db.add_all(routes)
         await db.flush()
-        print("→ routes inserted", flush=True)
+        print(" routes inserted", flush=True)
 
-        stops_data = [
-            ("McClurg Dining Hall", 35.205400, -85.922100, "Main dining hall, central campus."),
-            ("duPont Library",      35.204800, -85.921500, "Library and study hub."),
-            ("Hodson Hill",         35.203000, -85.925000, "Upperclass residence area."),
-            ("Quintard Hall",       35.204200, -85.924000, "Residence hall near the Village."),
-            ("Sewanee Inn",         35.206800, -85.920000, "Near the entrance to campus."),
-            ("Sewanee Market",      35.207500, -85.919000, "Grocery in Sewanee Village."),
-            ("Shenanigans",         35.207200, -85.918500, "Restaurant / bar in the Village."),
-            ("Spencer Hall",        35.204500, -85.923200, "Science classroom building."),
-        ]
-        for name, lat, lng, desc in stops_data:
+        for name, lat, lng, desc in sched.STOPS:
             await db.execute(text("""
                 INSERT INTO stops (stop_name, latitude, longitude, description, geom)
                 VALUES (
@@ -114,7 +103,7 @@ async def seed():
                 )
             """), {"n": name, "lat": lat, "lng": lng, "d": desc})
         await db.flush()
-        print("→ stops inserted", flush=True)
+        print(" stops inserted", flush=True)
 
         route_ids = {r.route_name: r.route_id for r in routes}
         stop_ids = dict((await db.execute(text(
@@ -139,13 +128,13 @@ async def seed():
                 sequence_number=seq, expected_min_from_start=mins,
             ))
         await db.flush()
-        print("→ route_stops inserted", flush=True)
+        print(" route_stops inserted", flush=True)
 
         pgarcia, admin = users[2], users[3]
         T1, T2 = pgarcia.user_id, admin.user_id
         S1, S2 = shuttles[0].shuttle_id, shuttles[1].shuttle_id
-        R1 = route_ids["Daytime Loop"]
-        R2 = route_ids["Weekend Night Route"]
+        R1 = route_ids[sched.DAYTIME]
+        R2 = route_ids[sched.NIGHT]
 
         def dt(s: str) -> datetime:
             return datetime.fromisoformat(s).replace(tzinfo=timezone.utc)
@@ -232,7 +221,7 @@ async def seed():
             """), {"tid": live_trip.trip_id, "lat": lat, "lng": lng,
                    "acc": acc, "spd": spd, "rec": recorded})
         await db.flush()
-        print("→ locations inserted", flush=True)
+        print("locations inserted", flush=True)
 
         db.add(Alert(
             title="Welcome to Sewanee Transit",
@@ -247,11 +236,11 @@ async def seed():
         ))
 
         await db.commit()
-        print(f"✓ Seeded. All accounts use password: {SEED_PASSWORD}", flush=True)
+        print(f"Seeded. All accounts use password: {SEED_PASSWORD}", flush=True)
 
 
 def _main():
-    print("→ _main starting", flush=True)
+    print(" _main starting", flush=True)
     try:
         asyncio.run(seed())
     except Exception as e:
@@ -259,7 +248,7 @@ def _main():
         print(f"✗ Seeding failed: {type(e).__name__}: {e}", flush=True)
         traceback.print_exc()
         raise
-    print("→ _main done", flush=True)
+    print(" _main done", flush=True)
 
 
 if __name__ == "__main__":

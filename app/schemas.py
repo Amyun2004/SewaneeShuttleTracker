@@ -144,7 +144,13 @@ class StopOut(BaseModel):
     description: str | None
     sequence_number:         int | None = None
     expected_min_from_start: int | None = None
+    extension_only:          bool = False
 
+class ScheduleRunOut(BaseModel):
+    run_id:             int
+    start_minutes:      int        # minutes after midnight; past 1440 = after midnight
+    service_days:       list[int]  # ISO weekdays, 1=Mon .. 7=Sun
+    includes_extension: bool
 
 class RouteSummary(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -162,7 +168,7 @@ class RouteDetail(BaseModel):
     route_name:  str
     description: str | None
     stops:       list[StopOut]
-
+    runs:        list[ScheduleRunOut] = []
 
 # ---------------------------------------------------------------------------
 # Incidents + alerts

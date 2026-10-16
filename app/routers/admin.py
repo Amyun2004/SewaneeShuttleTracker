@@ -27,7 +27,7 @@ async def dashboard(user: AdminDep, db: DBDep):
                  THEN 1 ELSE 0 END) AS on_time
         FROM trips t
         JOIN (SELECT route_id, MAX(expected_min_from_start) AS scheduled_minutes
-              FROM route_stops GROUP BY route_id) sched
+              FROM route_stops WHERE NOT extension_only GROUP BY route_id) sched
               ON sched.route_id = t.route_id
         WHERE t.status = 'completed'
           AND t.start_time >= now() - interval '7 days'
@@ -59,7 +59,7 @@ async def dashboard(user: AdminDep, db: DBDep):
     """))).mappings().all()
 
     weekend_stops = (await db.execute(text("""
-        SELECT st.stop_name, COUNT(*) AS visits
+        SELECT st.stop_name, COUNT(DISTINCT t.trip_id) AS visits
         FROM trips t
         JOIN routes r       ON r.route_id  = t.route_id
         JOIN route_stops rs ON rs.route_id = r.route_id
@@ -88,7 +88,7 @@ async def dashboard(user: AdminDep, db: DBDep):
         ) actual ON actual.route_id = r.route_id
         LEFT JOIN (
           SELECT rs.route_id, MAX(rs.expected_min_from_start) AS scheduled_minutes
-          FROM route_stops rs GROUP BY rs.route_id
+          FROM route_stops rs WHERE NOT rs.extension_only GROUP BY rs.route_id
         ) sched ON sched.route_id = r.route_id
         ORDER BY r.route_name
     """))).mappings().all()

@@ -19,10 +19,13 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Numeric,
+    SmallInteger,
     String,
     Text,
+    false,
     func,
 )
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -122,18 +125,43 @@ class Stop(Base):
 
 class RouteStop(Base):
     __tablename__ = "route_stops"
-
+        # Keyed by position, not stop: a loop can visit the same stop twice.
     route_id: Mapped[int] = mapped_column(
         ForeignKey("routes.route_id"), primary_key=True
     )
-    stop_id: Mapped[int] = mapped_column(
-        ForeignKey("stops.stop_id"), primary_key=True
-    )
-    sequence_number:         Mapped[int]
+    sequence_number: Mapped[int] = mapped_column(primary_key=True)
+    stop_id: Mapped[int] = mapped_column(ForeignKey("stops.stop_id"))
     expected_min_from_start: Mapped[int]
+    # True for stops only the last run before a break drives to.
+    extension_only: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default=false()
+    )
 
     route: Mapped[Route] = relationship(back_populates="stops")
     stop:  Mapped[Stop]  = relationship()
+
+
+class ScheduleRun(Base):
+    """One scheduled departure from the first stop of a route."""
+    __tablename__ = "schedule_runs"
+    __table_args__ = (
+        CheckConstraint(
+            "start_minutes >= 0 AND start_minutes < 2880",
+            name="ck_schedule_runs_start_minutes",
+        ),
+    )
+
+    run_id:   Mapped[int] = mapped_column(primary_key=True)
+    route_id: Mapped[int] = mapped_column(
+        ForeignKey("routes.route_id", ondelete="CASCADE")
+    )
+    # Minutes after midnight of the service day; past 1440 = after midnight.
+    start_minutes: Mapped[int]
+    # ISO weekdays the run operates: 1=Mon .. 7=Sun.
+    service_days: Mapped[list[int]] = mapped_column(ARRAY(SmallInteger))
+    includes_extension: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default=false()
+    )
 
 
 # ---------------------------------------------------------------------------

@@ -50,13 +50,25 @@ async def route_detail(route_id: int, db: DBDep):
                st.latitude::float  AS latitude,
                st.longitude::float AS longitude,
                st.description,
-               rs.sequence_number, rs.expected_min_from_start
+               rs.sequence_number, rs.expected_min_from_start,
+               rs.extension_only
         FROM route_stops rs JOIN stops st ON st.stop_id = rs.stop_id
         WHERE rs.route_id = :rid
         ORDER BY rs.sequence_number
     """), {"rid": route_id})).mappings().all()
 
-    return {**dict(route), "stops": [dict(s) for s in stops_rows]}
+    runs_rows = (await db.execute(text("""
+        SELECT run_id, start_minutes, service_days, includes_extension
+        FROM schedule_runs
+        WHERE route_id = :rid
+        ORDER BY start_minutes
+    """), {"rid": route_id})).mappings().all()
+
+    return {
+        **dict(route),
+        "stops": [dict(s) for s in stops_rows],
+        "runs": [dict(r) for r in runs_rows],
+    }
 
 
 @router.post("/incidents", status_code=201)
